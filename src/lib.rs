@@ -17,7 +17,7 @@ enum OrderSide {
     Sell,
 }
 
-#[derive(Clone)]
+#[derive(Clone, Copy)]
 struct Order {
     order_id: u64,
     order_number: u64,
@@ -100,15 +100,15 @@ fn get_epoch_ms() -> u128 {
 macro_rules! noop {
     () => {};
 }
-struct OrderBook<'a> {
+struct OrderBook {
     // will be in increasing order of price, best is last
-    buy_orders: BTreeSet<&'a Order>,
-    sell_orders: BTreeSet<&'a Order>,
+    buy_orders: BTreeSet<Order>,
+    sell_orders: BTreeSet<Order>,
     counter: u64,
 }
 
-impl<'a> OrderBook<'a> {
-    fn new() -> OrderBook<'a> {
+impl OrderBook {
+    fn new() -> OrderBook {
         OrderBook {
             buy_orders: BTreeSet::new(),
             sell_orders: BTreeSet::new(),
@@ -116,7 +116,7 @@ impl<'a> OrderBook<'a> {
         }
     }
 
-    fn add_order(&mut self, mut order: &'a mut Order) -> Vec<Fill> {
+    fn add_order(&mut self, mut order: Order) -> Vec<Fill> {
         order.timestamp = get_epoch_ms() as u64;
         order.order_number = self.counter;
         self.counter += 1;
@@ -143,18 +143,18 @@ impl<'a> OrderBook<'a> {
         fills
     }
 
-    fn remove_order(&mut self, order: &'a Order) {
+    fn remove_order(&mut self, order: Order) {
         match order.order_side {
             OrderSide::Buy => {
-                self.buy_orders.remove(order);
+                self.buy_orders.remove(&order);
             }
             OrderSide::Sell => {
-                self.sell_orders.remove(order);
+                self.sell_orders.remove(&order);
             }
         }
     }
 
-    fn replace_order(&mut self, order: &'a Order) {
+    fn replace_order(&mut self, order: Order) {
         match order.order_side {
             OrderSide::Buy => {
                 self.buy_orders.replace(order);
@@ -166,10 +166,10 @@ impl<'a> OrderBook<'a> {
     }
 }
 
-fn trade<'a>(
-    mut order: &'a mut Order,
-    opp: &mut BTreeSet<&'a Order>,
-    these: &mut BTreeSet<&'a Order>,
+fn trade(
+    mut order: Order,
+    opp: &mut BTreeSet<Order>,
+    these: &mut BTreeSet<Order>,
     bs: i64,
 ) -> Vec<Fill> {
     let mut fills: Vec<Fill> = Vec::new();
@@ -193,20 +193,22 @@ fn trade<'a>(
             fill.size = order.size;
             let mut next_order_clone: Order = next_order.clone();
             next_order_clone.size -= order.size;
-            let replacement: &'a Order = &next_order_clone;
+            let replacement: Order = next_order_clone;
             opp.replace(replacement);
             order.size = 0;
             fills.push(fill);
             break;
         } else if order.size > next_order.size {
             fill.size = next_order.size;
+            let mut next_order_clone: Order = next_order.clone();
             order.size -= next_order.size;
-            opp.remove(next_order);
+            opp.remove(&next_order_clone);
             fills.push(fill);
         } else if order.size == next_order.size {
             fill.size = next_order.size;
+            let mut next_order_clone: Order = next_order.clone();
             order.size = 0;
-            opp.remove(next_order);
+            opp.remove(&next_order_clone);
             fills.push(fill);
             break;
         }
@@ -229,13 +231,13 @@ mod tests {
         let mut order_book: crate::OrderBook = super::OrderBook::new();
         let mut order: super::Order = super::Order::new(super::OrderSide::Buy, 100, 100);
         let mut order2: super::Order = super::Order::new(super::OrderSide::Buy, 100, 101);
-        order_book.add_order(&mut order);
-        order_book.add_order(&mut order2);
+        order_book.add_order(order);
+        order_book.add_order(order2);
         assert_eq!(order_book.buy_orders.len(), 2);
-        let last: &&crate::Order = order_book.buy_orders.last().unwrap();
+        let last: crate::Order = *order_book.buy_orders.last().unwrap();
         assert_eq!(last.price, 101);
         order_book.remove_order(last);
-        let last: &&crate::Order = order_book.buy_orders.last().unwrap();
+        let last: crate::Order = *order_book.buy_orders.last().unwrap();
         assert_eq!(order_book.buy_orders.len(), 1);
         assert_eq!(last.price, 100);
     }
