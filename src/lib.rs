@@ -1,23 +1,33 @@
+#![crate_name = "orderlib"]
+
 use std::cmp;
 use std::cmp::Ordering;
 use std::collections::BTreeSet;
 use std::time::{SystemTime, UNIX_EPOCH};
 
 /// orderlib is a package that provides trading logic and order primitives for
-/// use in a provided, high performance data structure.  A B+Tree, "github.com/cznic/b"
+/// use in a provided, high performance data structure.  A std::collections::BTreeSet
 /// is used to hold orders.  Orders are processed in Price/Time priority.
 
 #[derive(Clone, Copy, Debug, PartialEq)]
 enum OrderType {
+    /// A Type to represent the orders that traders want to make.
+    /// Fill only up to the price limit indicated
     Limit,
-    Market, // Fill all, ignores price field
-    Fok,    // Check if it can be fully filled, execute if so, cancel otherwise
-    Ioc,    // Fill as much as possible, cancel the rest
-    Aon, // Do nothing until the entire order can be filled at the limit price or better, then execute
+    /// Fill all, ignores price field.
+    Market,
+    /// Check if it can be fully filled, execute if so, cancel otherwise
+    Fok,
+    /// Fill as much as possible, cancel the rest
+    Ioc,
+    /// Do nothing until the entire order can be filled at the limit price or better, then execute
+    Aon,
 }
 
 #[derive(Clone, Copy, Debug, PartialEq)]
 enum OrderSide {
+    /// Side represents whether the order means to sell as asset or to buy it.
+    /// This is useful for ensuring the order ends up in the right place.
     Buy,
     Sell,
 }
@@ -107,6 +117,8 @@ fn get_epoch_ms() -> i64 {
 macro_rules! noop {
     () => {};
 }
+
+#[derive(Debug)]
 struct OrderBook {
     // will be in increasing order of price, best is last
     buy_orders: BTreeSet<Order>,
@@ -115,6 +127,15 @@ struct OrderBook {
 }
 
 impl OrderBook {
+    /// Constructs a new `OrderBook`.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use orderlib::new;
+    ///
+    /// let ob = orderlib::new();
+    /// ```
     fn new() -> OrderBook {
         OrderBook {
             buy_orders: BTreeSet::new(),

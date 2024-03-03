@@ -1,5 +1,5 @@
 [package]
-name = "orderlib-rs"
+name = "orderlib"
 version = "0.1.0"
 edition = "2021"
 
