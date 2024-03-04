@@ -114,10 +114,6 @@ fn get_epoch_ms() -> i64 {
         .as_millis() as i64
 }
 
-macro_rules! noop {
-    () => {};
-}
-
 #[derive(Debug)]
 struct OrderBook {
     // will be in increasing order of price, best is last
@@ -149,15 +145,9 @@ impl OrderBook {
         order.order_number = self.counter;
         self.counter += 1;
         match order.order_type {
-            OrderType::Fok => {
-                noop!();
-            }
-            OrderType::Aon => {
-                noop!();
-            }
-            _ => {
-                noop!();
-            }
+            OrderType::Fok => {}
+            OrderType::Aon => {}
+            _ => {}
         }
         match order.order_side {
             OrderSide::Buy => {
