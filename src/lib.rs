@@ -140,7 +140,7 @@ pub mod orderlib {
             }
         }
 
-        fn next(&mut self, side: OrderSide) -> Option<&Order> {
+        pub fn next(&mut self, side: OrderSide) -> Option<&Order> {
             match side {
                 OrderSide::Buy => {
                     return self.sell_orders.first();
@@ -369,7 +369,6 @@ pub mod orderlib {
 
 #[cfg(test)]
 mod tests {
-    use super::orderlib;
     use super::orderlib::Fill;
     use super::orderlib::LimitReport;
     use super::orderlib::Order;
