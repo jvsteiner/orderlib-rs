@@ -16,11 +16,12 @@ pub mod orderlib {
         Limit,
         /// Fill all, ignores price field.
         Market,
-        /// Check if it can be fully filled, execute if so, cancel otherwise
+        /// Check if it can be fully filled, execute if so, cancel otherwise: Fill or Kill
         Fok,
-        /// Fill as much as possible, cancel the rest
+        /// Fill as much as possible, cancel the rest: Immediate or Cancel
         Ioc,
-        /// Do nothing until the entire order can be filled at the limit price or better, then execute
+        /// Do nothing until the entire order can be filled at the limit price or better, then execute:
+        /// All or None
         Aon,
     }
 
