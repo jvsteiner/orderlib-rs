@@ -1,13 +1,9 @@
 #[macro_use]
 extern crate criterion;
 use criterion::{black_box, Criterion};
-use orderlib::orderlib::Order;
-use orderlib::orderlib::OrderBook;
-use orderlib::orderlib::OrderSide::Buy;
-use orderlib::orderlib::OrderSide::Sell;
-use orderlib::orderlib::OrderType::Limit;
+use orderlib::orderlib::{Order, OrderBook, OrderSide::Buy, OrderSide::Sell, OrderType::Limit};
 
-pub fn my_benchmark(c: &mut Criterion) {
+pub fn symmetric_buy_sell(c: &mut Criterion) {
     let mut order_book: OrderBook = OrderBook::new();
     c.bench_function("symmetric_buy_sell", |b| {
         b.iter(|| {
@@ -18,5 +14,5 @@ pub fn my_benchmark(c: &mut Criterion) {
     });
 }
 
-criterion_group!(benches, my_benchmark);
+criterion_group!(benches, symmetric_buy_sell);
 criterion_main!(benches);

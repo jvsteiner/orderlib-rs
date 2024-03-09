@@ -370,16 +370,10 @@ pub mod orderlib {
 
 #[cfg(test)]
 mod tests {
-    use super::orderlib::Fill;
-    use super::orderlib::LimitReport;
-    use super::orderlib::Order;
-    use super::orderlib::OrderBook;
-    use super::orderlib::OrderSide;
-    use super::orderlib::OrderSide::Buy;
-    use super::orderlib::OrderSide::Sell;
-    use super::orderlib::OrderType::Ioc;
-    use super::orderlib::OrderType::Limit;
-    use super::orderlib::OrderType::Market;
+    use super::orderlib::{
+        Fill, LimitReport, Order, OrderBook, OrderSide, OrderSide::Buy, OrderSide::Sell,
+        OrderType::Ioc, OrderType::Limit, OrderType::Market,
+    };
 
     #[test]
     fn test_add_delete_orderbook() {
